@@ -1,24 +1,17 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
+from flask_graphql import GraphQLView
 
 from graphene import ObjectType, Field, Schema
-
-from app.schema.user_schema import schema
+from app.data.user.queries import Query as UserQuery
+from app.data.user.mutations import Mutations as UserMutations
 
 kanji = Blueprint('kanji', __name__)
 
-@kanji.route('/kanji', methods=['GET'])
-def index():
-
-	result = schema.execute(
-	    '''
-	    {
-		  user {
-		    lastname
-		  }
-		}
-	    '''
-	)
-
-	return jsonify(
-		data=result.data
-	)
+kanji.add_url_rule(
+    '/graphql',
+    view_func = GraphQLView.as_view(
+        'graphql',
+        schema = Schema(query=UserQuery, mutation=UserMutations),
+        graphiql = True
+    )
+)
