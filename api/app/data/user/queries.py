@@ -1,18 +1,17 @@
-from graphene import ObjectType, List, ID
-from app.model.user_model import data as UserData, User as UserModel
+from graphene import ObjectType, List, ID, Field
+from graphene.relay import Node
+from graphene_mongo import MongoengineConnectionField, MongoengineObjectType
+
+from app.model.user_model import User as UserModel
+from app.data.user.types import User as UserType
 
 class Query(ObjectType):
-    users = List(UserModel, userid=ID(required=False, default_value=None))
+    node = Node.Field()
+    user = Field(UserType, userid=ID(required=False, default_value=None))
+    users = List(UserType)
 
-    def resolve_users(
-        self, 
-        info, 
-        userid=None,
-        ):
+    def resolve_user(self, info, userid=None):
+        return UserModel.objects(pk=userid).get()
 
-        if userid is None:
-            return UserData
-
-        for user in UserData:
-            if user.id is int(userid):
-                return [user]
+    def resolve_users(self, info, userid=None):
+        return list(UserModel.objects.all())

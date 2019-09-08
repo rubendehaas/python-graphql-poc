@@ -1,11 +1,12 @@
-from mongoengine import *
+from mongoengine import connect
 
-from model.user_mongo_model import User
+from app.model.user_model import User
 
-connect('user_db', alias='default')
+connect('test', host="mongodb://mongo", alias='default')
 
 
 def init_db():
+
     # Create the fixtures
     user1 = User(
         firstname = 'Pjotr',
